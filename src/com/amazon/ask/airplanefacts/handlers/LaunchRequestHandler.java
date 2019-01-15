@@ -3,16 +3,21 @@ package com.amazon.ask.airplanefacts.handlers;
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.LaunchRequest;
+import com.amazon.ask.model.Permissions;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.model.interfaces.display.*;
+import com.amazon.ask.model.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.amazon.speech.ui.AskForPermissionsConsentCard;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.amazon.ask.request.Predicates.requestType;
 
 public class LaunchRequestHandler implements RequestHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(LaunchRequestHandler.class);
 
     @Override
     public boolean canHandle(HandlerInput input) {
@@ -32,15 +37,49 @@ public class LaunchRequestHandler implements RequestHandler {
         Image image = getImage(imageUrl);
 
         Template template = getBodyTemplate6(primaryText, secondaryText, image);
+        Session session = input.getRequestEnvelope().getSession();
+
+        Permissions permissions = session.getUser().getPermissions();
+        log.error("-------------------------111111111111111111111");
+        if (permissions == null) {
+            log.error("-------------------------22222222222222222222222");
+
+            List<String> permissionsList = new ArrayList<>();
+            permissionsList.add("alexa::profile:name:read`");
+            permissionsList.add("alexa::profile:email:read");
+
+            AskForPermissionsConsentCard askForPermissionsConsentCard = new AskForPermissionsConsentCard();
+            log.error("The user hasn't authorized the skill. Sending a permissions card.");
+            speechText = "You have not given this skill permissions to access your details. " +
+                    "Using the Alexa App on your phone, please give this skill permissions to access your name and email address.";
+
+            log.error("-------------------------333333333333333333333333333");
+
+            if(null!=input.getRequestEnvelope().getContext().getDisplay()) {
+                log.error("-------------------------44444444444444444444");
+
+                return input.getResponseBuilder()
+                        .withSpeech(speechText)
+                        .withSimpleCard(title, speechText)
+                        .addRenderTemplateDirective(template)
+                        //.withAskForPermissionsConsentCard(permissionsList)
+                        .withReprompt(speechText)
+                        .build();
+
+            } else {
+                //Headless device
+                return input.getResponseBuilder()
+                        .withSimpleCard("Missing Permissions", speechText)
+                        .withSpeech(speechText)
+                        .withAskForPermissionsConsentCard(permissionsList)
+                        .build();
+            }
+
+        }
 
         // Device supports display interface
         if(null!=input.getRequestEnvelope().getContext().getDisplay()) {
-            return input.getResponseBuilder()
-                    .withSpeech(speechText)
-                    .withSimpleCard(title, speechText)
-                    .addRenderTemplateDirective(template)
-                    .withReprompt(speechText)
-                    .build();
+            return displayResponse(input, speechText, title, template);
         } else {
             //Headless device
             return input.getResponseBuilder()
@@ -49,6 +88,15 @@ public class LaunchRequestHandler implements RequestHandler {
                     .withReprompt(speechText)
                     .build();
         }
+    }
+
+    private Optional<Response> displayResponse (HandlerInput input, String speechText, String title, Template template) {
+        return input.getResponseBuilder()
+                .withSpeech(speechText)
+                .withSimpleCard(title, speechText)
+                .addRenderTemplateDirective(template)
+                .withReprompt(speechText)
+                .build();
     }
 
     /**
@@ -114,5 +162,4 @@ public class LaunchRequestHandler implements RequestHandler {
                 .withText(text)
                 .build();
     }
-
 }
