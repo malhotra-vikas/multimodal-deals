@@ -4,10 +4,16 @@ import com.amazon.ask.Skill;
 import com.amazon.ask.Skills;
 import com.amazon.ask.SkillStreamHandler;
 import com.amazon.ask.airplanefacts.handlers.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AirplaneFactsStreamHandler extends SkillStreamHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(AirplaneFactsStreamHandler.class);
+
     private static Skill getSkill() {
+        log.debug("in getSkill");
+
         return Skills.standard()
                 .addRequestHandlers(
                         new CancelandStopIntentHandler(),
