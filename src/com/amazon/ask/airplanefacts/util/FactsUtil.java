@@ -1,5 +1,7 @@
 package com.amazon.ask.airplanefacts.util;
 
+import com.amazon.ask.model.interfaces.display.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,92 @@ public class FactsUtil {
         map.put("Crock Pot", "https://www.target.com/p/crock-pot-174-3-5-quart-casserole-crock-slow-cooker-sccpccm350/-/A-16637101?preselect=17219694#lnk=sametab");
         map.put("Beechcraft Beechjet 400A", "https://www.avbuyer.com/aircraft/private-jets/beechcraft/beechjet-400a/354658");
         return map;
+    }
+
+    /**
+     * Helper method to create a body template 6
+     * @param primaryText the primary text to be displayed in the template on the show
+     * @param secondaryText the secondary text to be displayed in the template on the show
+     * @param image  the url of the image
+     * @return Template
+     */
+    public static Template getBodyTemplate6(String primaryText, String secondaryText, Image image) {
+        return BodyTemplate6.builder()
+                .withBackgroundImage(image)
+                .withTextContent(getTextContent(primaryText, secondaryText))
+                .build();
+    }
+
+
+    public static Template getBodyTemplate3(String primaryText, String secondaryText, Image backgroundImage,
+                                      String title, Image dealImage) {
+        if (null != dealImage) {
+            return BodyTemplate3.builder()
+                    .withBackgroundImage(backgroundImage)
+                    .withTextContent(getTextContent(primaryText, secondaryText))
+                    .withTitle(title)
+                    .withImage(dealImage)
+                    .build();
+        } else {
+            return BodyTemplate3.builder()
+                    .withBackgroundImage(backgroundImage)
+                    .withTextContent(getTextContent(primaryText, secondaryText))
+                    .withTitle(title)
+                    .build();
+        }
+
+    }
+
+    /**
+     * Helper method to create the image object for display interfaces
+     * @param imageUrl the url of the image
+     * @return Image that is used in a body template
+     */
+    public static Image getImage(String imageUrl) {
+        List<ImageInstance> instances = getImageInstance(imageUrl);
+        return Image.builder()
+                .withSources(instances)
+                .build();
+    }
+
+    /**
+     * Helper method to create List of image instances
+     * @param imageUrl the url of the image
+     * @return instances that is used in the image object
+     */
+    public static List<ImageInstance> getImageInstance(String imageUrl) {
+        List<ImageInstance> instances = new ArrayList<>();
+        ImageInstance instance = ImageInstance.builder()
+                .withUrl(imageUrl)
+                .withHeightPixels(320)
+                .withWidthPixels(320)
+                .build();
+        instances.add(instance);
+        return instances;
+    }
+
+    /**
+     * Helper method that returns text content to be used in the body template.
+     * @param primaryText
+     * @param secondaryText
+     * @return RichText that will be rendered with the body template
+     */
+    public static TextContent getTextContent(String primaryText, String secondaryText) {
+        return TextContent.builder()
+                .withPrimaryText(makeRichText(primaryText))
+                .withSecondaryText(makeRichText(secondaryText))
+                .build();
+    }
+
+    /**
+     * Helper method that returns the rich text that can be set as the text content for a body template.
+     * @param text The string that needs to be set as the text content for the body template.
+     * @return RichText that will be rendered with the body template
+     */
+    public static RichText makeRichText(String text) {
+        return RichText.builder()
+                .withText(text)
+                .build();
     }
 
     //URL Shortner

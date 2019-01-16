@@ -1,5 +1,8 @@
 package com.amazon.ask.airplanefacts.util;
+public class AWSeMailService {
 
+}
+/*
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
@@ -86,3 +89,4 @@ public class AWSeMailService {
     }
 
 }
+*/
